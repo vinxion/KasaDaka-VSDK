@@ -5,14 +5,17 @@ plays back a message, then sends the user to the redirect
 
 {% block content %}
 <form>
-<block>
+<field name="rain"
+      type="digits?length=2">
 <prompt>
 <audio src="{{ message_voice_fragment_url }}"/>
 </prompt>
+<filled>
 {% if redirect_url %}
 <goto next="{{ redirect_url }}"/>
+</filled>
 {% endif %}
-</block>
+</field>
 </form>
 
 {% endblock %}
