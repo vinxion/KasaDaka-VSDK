@@ -1,0 +1,91 @@
+{% extends "base.xml" %}
+{% block content%}
+<form  id="wr_form">
+	<field name="wr_rain">
+		<prompt>
+			<audio src="{{ rain_voice_label }}"/>
+			{% for rain_option_voice_label in rain_options_voice_labels %}
+				<audio src="{{ language.get_interface_voice_label_url_dict.pre_choice_option }}"/>
+				<audio src="{{ rain_option_voice_label }}"/>
+				<audio src="{{ language.get_interface_voice_label_url_dict.post_choice_option }}"/>
+			{% for number in language.get_interface_numbers_voice_label_url_list %}{% if forloop.counter0 == forloop.parentloop.counter %}<audio src="{{ number }}"/>{% endif %}{% endfor %}
+			{% endfor %}
+</prompt>
+
+{# all possible inputs from the user #}
+<grammar xml:lang="en-US" root = "MYRULE" mode="dtmf">
+      <rule id="MYRULE" scope = "public">
+        <one-of>
+          {% for option in rain_options %}
+            <item>{{ forloop.counter }}</item>
+          {% endfor %}
+        </one-of>
+       </rule>
+</grammar>
+
+{# when there has been input, redirect the user to the corresponding URL #}
+<filled>
+    {% for option in rain_options %}
+      {% if forloop.counter == 1 %}
+      <if cond="wr_rain	  == '{{ forloop.counter }}'">
+	   <assign name="rain" expr="'{{ option.id   }}'"/>
+	      {% comment %} TODO hoe doe je een url opzoeken als je nog niet weet welke class object je naar refereert? {% endcomment %}
+      {% else %}
+      <elseif cond="wr_rain == '{{ forloop.counter }}'" />
+      <assign name="rain" expr="'{{ option.id   }}'"/>
+      {% endif %}
+    {% endfor %}
+
+
+    <else/>
+    </if>
+	<goto next="#wr_wind"/>
+  </filled>
+
+</field>
+	<field name="wr_wind">
+		<prompt>
+			<audio src="{{ wind_voice_label }}"/>
+			{% for wind_option_voice_label in wind_options_voice_labels %}
+				<audio src="{{ language.get_interface_voice_label_url_dict.pre_choice_option }}"/>
+				<audio src="{{ wind_option_voice_label }}"/>
+				<audio src="{{ language.get_interface_voice_label_url_dict.post_choice_option }}"/>
+			{% for number in language.get_interface_numbers_voice_label_url_list %}{% if forloop.counter0 == forloop.parentloop.counter %}<audio src="{{ number }}"/>{% endif %}{% endfor %}
+			{% endfor %}
+</prompt>
+
+{# all possible inputs from the user #}
+<grammar xml:lang="en-US" root = "MYRULE" mode="dtmf">
+      <rule id="MYRULE" scope = "public">
+        <one-of>
+          {% for option in wind_options %}
+            <item>{{ forloop.counter }}</item>
+          {% endfor %}
+        </one-of>
+       </rule>
+</grammar>
+
+{# when there has been input, redirect the user to the corresponding URL #}
+<filled>
+    {% for option in wind_options %}
+      {% if forloop.counter == 1 %}
+      <if cond="wr_wind == '{{ forloop.counter }}'">
+	   <assign name="wind" expr="'{{ option.id   }}'"/>
+	      {% comment %} TODO hoe doe je een url opzoeken als je nog niet weet welke class object je naar refereert? {% endcomment %}
+      {% else %}
+      <elseif cond="wr_wind == '{{ forloop.counter }}'" />
+      <assign name="wind" expr="'{{ option.id   }}'"/>
+      {% endif %}
+    {% endfor %}
+
+
+    <else/>
+    </if>
+	<assign name="session_id" expr="{{ session_id   }}''"/>
+	<submit next="{{ redirect }}" method="post" 
+     namelist="wind rain session_id" />
+  </filled>
+
+</field>
+</form>
+{% endblock %}
